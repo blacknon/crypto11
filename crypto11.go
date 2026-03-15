@@ -425,13 +425,15 @@ func Configure(config *Config) (*Context, error) {
 		config.GCMIVLength = DefaultGCMIVLength
 	}
 
-	modCtx, err := openModule(config.Path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create module context: %w", err)
-	}
-
+	var modCtx moduleCtx
 	if config.PKCS11Ctx != nil {
 		modCtx.Ctx = config.PKCS11Ctx
+	} else {
+		var err error
+		modCtx, err = openModule(config.Path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create module context: %w", err)
+		}
 	}
 
 	instance := &Context{
